@@ -23,7 +23,10 @@ class _ProductFormState extends State<ProductForm> {
   final _preuMinimController = TextEditingController();
   final _multiplicadorRestaController = TextEditingController();
   final _multiplicadorSumaController = TextEditingController();
-
+  final _usuariController = TextEditingController();
+  final _categoriaController = TextEditingController();
+  final _numCompresController = TextEditingController();
+  final _fotoController = TextEditingController();
   @override
   void initState() {
     super.initState();
@@ -33,8 +36,11 @@ class _ProductFormState extends State<ProductForm> {
   }
 
   Future<void> addProducte() async {
-    final response = await http.get(Uri.parse('http://127.0.0.1:8000/get/products/${widget.id}'));
+    print('Fetching product data...');
+    final response =
+        await http.get(Uri.parse('http://127.0.0.1:8000/post/product/add/'));
     if (response.statusCode == 200) {
+      print('Product data fetched successfully.');
       final data = jsonDecode(response.body);
       _nomController.text = data['nom'];
       _descripcioController.text = data['descripcio'];
@@ -43,35 +49,49 @@ class _ProductFormState extends State<ProductForm> {
       _costController.text = data['cost'].toString();
       _preuMaximController.text = data['preu_maxim'].toString();
       _preuMinimController.text = data['preu_minim'].toString();
-      _multiplicadorRestaController.text = data['multiplicador_resta'].toString();
+      _multiplicadorRestaController.text =
+          data['multiplicador_resta'].toString();
       _multiplicadorSumaController.text = data['multiplicador_suma'].toString();
+      _usuariController.text = data['usuari'].toString();
+      _categoriaController.text = data['categoria'].toString();
+      _numCompresController.text = data['num_compres'].toString();
     } else {
+      print('Failed to fetch product data. Status code: ${response.statusCode}');
       throw Exception('Has fet alguna cosa malament!');
     }
   }
-
+  
   Future<void> saveData() async {
     if (_formKey.currentState!.validate()) {
+      print('Saving data...');
       final response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/post/products/'),
+        Uri.parse('http://127.0.0.1:8000/post/product/add/'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
-        body: jsonEncode(<String, String>{
+        body: jsonEncode(<String, dynamic>{
           'nom': _nomController.text,
           'descripcio': _descripcioController.text,
-          'quantitat': _quantitatController.text,
-          'preu': _preuController.text,
-          'cost': _costController.text,
-          'preu_maxim': _preuMaximController.text,
-          'preu_minim': _preuMinimController.text,
-          'multiplicador_resta': _multiplicadorRestaController.text,
-          'multiplicador_suma': _multiplicadorSumaController.text,
+          'quantitat': int.parse(_quantitatController.text),
+          'preu': double.parse(_preuController.text),
+          'cost': double.parse(_costController.text),
+          'preu_maxim': double.parse(_preuMaximController.text),
+          'preu_minim': double.parse(_preuMinimController.text),
+          'multiplicador_resta': double.parse(_multiplicadorRestaController.text),
+          'multiplicador_suma': double.parse(_multiplicadorSumaController.text),
+          'usuari': int.parse(_usuariController.text),
+          'categoria': int.parse(_categoriaController.text),
+          'num_compres': int.parse(_numCompresController.text),
         }),
       );
-      if (response.statusCode != 201) {
+      if (response.statusCode == 201) {
+        print('Data saved successfully.');
+      } else {
+        print('Failed to save data. Status code: ${response.statusCode}');
         throw Exception('Failed to post data');
       }
+    } else {
+      print('Form is not valid. Not saving data.');
     }
   }
 
@@ -87,6 +107,18 @@ class _ProductFormState extends State<ProductForm> {
           padding: const EdgeInsets.all(16.0),
           child: ListView(
             children: <Widget>[
+              TextFormField(
+                controller: _nomController,
+                decoration: const InputDecoration(
+                  labelText: 'Nom',
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a nom';
+                  }
+                  return null;
+                },
+              ),
               TextFormField(
                 controller: _descripcioController,
                 decoration: const InputDecoration(
@@ -186,6 +218,51 @@ class _ProductFormState extends State<ProductForm> {
                   }
                   return null;
                 },
+              ),
+              TextFormField(
+                controller: _usuariController,
+                decoration: const InputDecoration(
+                  labelText: 'Usuari',
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a usuari';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _categoriaController,
+                decoration: const InputDecoration(
+                  labelText: 'Categoria',
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a categoria';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _numCompresController,
+                decoration: const InputDecoration(
+                  labelText: 'Num Compres',
+                ),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a num compres';
+                  }
+                  return null;
+                },
+              ),
+               ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    saveData();
+                  }
+                },
+                child: Text('Submit'),
               ),
             ],
           ),

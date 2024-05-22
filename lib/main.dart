@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'afegir_productes.dart';
 
 void main() {
   runApp(MyApp());
@@ -45,6 +46,17 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+Future<Map<String, dynamic>> fetchStatistics(String userId, [String productId = '']) async {
+  final response = await http.get(Uri.parse('http://127.0.0.1:8000/post/estadisticas/$userId/$productId'));
+
+  if (response.statusCode == 200) {
+    // Si el servidor devuelve una respuesta OK, parseamos el JSON.
+    return jsonDecode(response.body);
+  } else {
+    // Si la respuesta no fue OK, lanzamos un error.
+    throw Exception('Failed to load statistics');
+  }
+}
   Future<List<Map<String, dynamic>>> fetchAllUsers() async {
     final response = await http.get(Uri.parse('http://127.0.0.1:8000/post/users/'));
 
@@ -102,55 +114,122 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   String? selectedProductId;
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My App'),
+        title: const Text('Preus Dinamics'),
       ),
-      body: Column(
+      body: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          DropdownButton<String>(
-            value: selectedUserId,
-            onChanged: (String? newValue) {
-              setState(() {
-                selectedUserId = newValue;
-                selectedUserProducts = products
-                  .where((product) => product['usuari'].toString() == newValue)
-                  .toList();
-                selectedProductId = null;
-              });
-            },
-            items: users.map<DropdownMenuItem<String>>((user) {
-              return DropdownMenuItem<String>(
-                value: user['id'].toString(),
-                child: Text(user['nombre']),
-              );
-            }).toList(),
+          Column(
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ProductForm()),
+                  );
+                },
+                child: Text('Afegir productes'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ProductForm()),
+                  );
+                },
+                child: Text('Modificar Productes'),
+              ),
+            ],
           ),
-          if (selectedUserId != null)
-            if (selectedUserProducts.isEmpty)
-              Text('La tienda no tiene productos')
-            else
+          Column(
+            children: [
+              Text(
+                'Estadísticas',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              // Comprueba si selectedUserId y selectedProductId son null
+              if (selectedUserId != null && selectedProductId != null)
+                // Si no son null, renderiza el FutureBuilder
+                FutureBuilder<Map<String, dynamic>>(
+                  future: fetchStatistics(selectedUserId!, selectedProductId!),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return Column(
+                        children: <Widget>[
+                          Text('Beneficios: ${snapshot.data?['beneficios']}'),
+                          Text('Volumen de ventas: ${snapshot.data?['total_vendidos']}'),
+                        ],
+                      );
+                    } else if (snapshot.hasError) {
+                      return Text("${snapshot.error}");
+                    }
+
+                    // Por defecto, muestra un spinner de carga.
+                    return CircularProgressIndicator();
+                  },
+                ),
+              // Si son null, muestra un mensaje
+              if (selectedUserId == null || selectedProductId == null)
+                Text('Por favor, selecciona un usuario y un producto'),
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               DropdownButton<String>(
-                value: selectedProductId,
+                value: selectedUserId,
                 onChanged: (String? newValue) {
                   setState(() {
-                    selectedProductId = newValue;
+                    selectedUserId = newValue;
+                    selectedUserProducts = products
+                      .where((product) => product['usuari'].toString() == newValue)
+                      .toList();
+                    selectedProductId = null;
                   });
                 },
-                items: selectedUserProducts.map<DropdownMenuItem<String>>((product) {
+                items: users.map<DropdownMenuItem<String>>((user) {
                   return DropdownMenuItem<String>(
-                    value: product['id'].toString(),
-                    child: Text(product['nom']),
+                    value: user['id'].toString(),
+                    child: Text(user['nombre']),
                   );
                 }).toList(),
               ),
-          Expanded(child: buildUsersList()),
-          Expanded(child: buildProductsList()),
+              if (selectedUserId != null)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (selectedUserProducts.isEmpty)
+                      Text('La tienda no tiene productos')
+                    else
+                      DropdownButton<String>(
+                        value: selectedProductId,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedProductId = newValue;
+                          });
+                        },
+                        items: selectedUserProducts.map<DropdownMenuItem<String>>((product) {
+                          return DropdownMenuItem<String>(
+                            value: product['id'].toString(),
+                            child: Text(product['nom']),
+                          );
+                        }).toList(),
+                      ),
+                    if (selectedProductId != null)
+                      Text(
+                        '${selectedUserProducts.firstWhere((product) => product['id'].toString() == selectedProductId)['preu']} \$',
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                  ],
+                ),
+            ],
+          ),
         ],
       ),
     );
   }
-  }
+}
