@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:ultima_fluter/visualitzar_productes.dart';
 import 'afegir_productes.dart';
+import 'editar_productes.dart';
 
 void main() {
   runApp(MyApp());
@@ -138,7 +140,7 @@ Future<Map<String, dynamic>> fetchStatistics(String userId, [String productId = 
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => ProductForm()),
+                    MaterialPageRoute(builder: (context) => VisualitzarProductes()),
                   );
                 },
                 child: Text('Modificar Productes'),
