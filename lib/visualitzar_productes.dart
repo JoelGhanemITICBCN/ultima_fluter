@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'editar_productes.dart';
 import 'data_provider.dart';
+import 'afegir_venda.dart';
 
 class VisualitzarProductes extends StatefulWidget {
   VisualitzarProductes({Key? key}) : super(key: key);
@@ -37,13 +38,37 @@ class _VisualitzarProductesState extends State<VisualitzarProductes> {
               children: dataProvider.products.map((product) {
                 return Card(
                   child: ListTile(
-                    title: Text(product['nom']),
+                    title: GestureDetector(
+                      onTap: () {
+                        if (product['id'] != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => EditaForm(productId: product['id'].toString(), id: product['id'])),
+                          );
+                        } else {
+                        }
+                      },
+                      child: Text(product['nom']),
+                    ),
                     subtitle: Text('${product['preu']} \$\n${product['descripcio']}'),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
-                          icon: Icon(Icons.edit),
+                          icon: Icon(Icons.add_circle, color: Colors.green), // Green add icon
+                          onPressed: () {
+                            if (product['id'] != null) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => AddSaleScreen(productId: product['id'])),
+                              );
+                            } else {
+                              print('Product ID is null');
+                            }
+                          },
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.edit, color: Colors.yellow), // Yellow edit icon
                           onPressed: () {
                             if (product['id'] != null) {
                               Navigator.push(
@@ -56,9 +81,9 @@ class _VisualitzarProductesState extends State<VisualitzarProductes> {
                           },
                         ),
                         IconButton(
-                          icon: Icon(Icons.delete),
+                          icon: Icon(Icons.delete, color: Colors.red), 
                           onPressed: () {
-                            // deleteProduct(product['id']);
+                            Provider.of<DataProvider>(context, listen: false).deleteProduct(product['id']);
                           },
                         ),
                       ],

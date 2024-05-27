@@ -1,4 +1,4 @@
-
+import 'visualitzar_productes.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -31,18 +31,15 @@ class _EditaFormState extends State<EditaForm> {
   @override
   void initState() {
     super.initState();
-    print('Product ID: ${widget.id}');
     if (widget.id != null) {
       getProductData();
     }
   }
 
   Future<void> getProductData() async {
-    print('Fetching product data...');
-    final response =
-        await http.get(Uri.parse('http://127.0.0.1:8000/post/product/${widget.id}/'));
+    final response = await http
+        .get(Uri.parse('http://127.0.0.1:8000/post/product/${widget.id}/'));
     if (response.statusCode == 200) {
-      print('Product data fetched successfully.');
       final data = jsonDecode(response.body);
       _nomController.text = data['nom'];
       _descripcioController.text = data['descripcio'];
@@ -58,14 +55,12 @@ class _EditaFormState extends State<EditaForm> {
       _categoriaController.text = data['categoria'].toString();
       _numCompresController.text = data['num_compres'].toString();
     } else {
-      print('Failed to fetch product data. Status code: ${response.statusCode}');
       throw Exception('Has fet alguna cosa malament!');
     }
   }
 
   Future<void> saveData() async {
     if (_formKey.currentState!.validate()) {
-      print('Saving data...');
       final response = await http.put(
         Uri.parse('http://127.0.0.1:8000/post/product/update/${widget.id}/'),
         headers: <String, String>{
@@ -79,7 +74,8 @@ class _EditaFormState extends State<EditaForm> {
           'cost': double.parse(_costController.text),
           'preu_maxim': double.parse(_preuMaximController.text),
           'preu_minim': double.parse(_preuMinimController.text),
-          'multiplicador_resta': double.parse(_multiplicadorRestaController.text),
+          'multiplicador_resta':
+              double.parse(_multiplicadorRestaController.text),
           'multiplicador_suma': double.parse(_multiplicadorSumaController.text),
           'usuari': int.parse(_usuariController.text),
           'categoria': int.parse(_categoriaController.text),
@@ -87,19 +83,15 @@ class _EditaFormState extends State<EditaForm> {
         }),
       );
       if (response.statusCode == 200) {
-        print('Data updated successfully.');
       } else {
-        print('Failed to update data. Status code: ${response.statusCode}');
-        throw Exception('Failed to post data');
+        throw Exception('No s ha guardat');
       }
     } else {
-      print('Form is not valid. Not saving data.');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    print("llegua a editaProductes");
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.id == null ? 'Add Product' : 'Edit Product'),
@@ -109,7 +101,7 @@ class _EditaFormState extends State<EditaForm> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: ListView(
-           children: <Widget>[
+            children: <Widget>[
               TextFormField(
                 controller: _nomController,
                 decoration: const InputDecoration(
@@ -117,7 +109,7 @@ class _EditaFormState extends State<EditaForm> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a nom';
+                    return 'Introdueix un nom';
                   }
                   return null;
                 },
@@ -129,7 +121,7 @@ class _EditaFormState extends State<EditaForm> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a descripcio';
+                    return 'Introdueix un descripcio';
                   }
                   return null;
                 },
@@ -181,7 +173,7 @@ class _EditaFormState extends State<EditaForm> {
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a preu maxim';
+                    return 'Introdueix un preu maxim';
                   }
                   return null;
                 },
@@ -193,7 +185,7 @@ class _EditaFormState extends State<EditaForm> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a preu minim';
+                    return 'Introdueix un preu minim';
                   }
                   return null;
                 },
@@ -205,7 +197,7 @@ class _EditaFormState extends State<EditaForm> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a multiplicador resta';
+                    return 'Introdueix un multiplicador resta';
                   }
                   return null;
                 },
@@ -217,7 +209,7 @@ class _EditaFormState extends State<EditaForm> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a multiplicador suma';
+                    return 'Introdueix un multiplicador suma';
                   }
                   return null;
                 },
@@ -229,7 +221,7 @@ class _EditaFormState extends State<EditaForm> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a usuari';
+                    return 'Introdueix un usuari';
                   }
                   return null;
                 },
@@ -241,7 +233,7 @@ class _EditaFormState extends State<EditaForm> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a categoria';
+                    return 'Introdueix una categoria';
                   }
                   return null;
                 },
@@ -254,18 +246,23 @@ class _EditaFormState extends State<EditaForm> {
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a num compres';
+                    return 'Introdueix un num compres';
                   }
                   return null;
                 },
               ),
-               ElevatedButton(
+              ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     saveData();
                   }
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => VisualitzarProductes()),
+                  );
                 },
-                child: Text('Submit'),
+                child: Text('Modifica el producte'),
               ),
             ],
           ),

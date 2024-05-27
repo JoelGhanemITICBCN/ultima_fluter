@@ -36,11 +36,9 @@ class _ProductFormState extends State<ProductForm> {
   }
 
   Future<void> addProducte() async {
-    print('Fetching product data...');
     final response =
         await http.get(Uri.parse('http://127.0.0.1:8000/post/product/add/'));
     if (response.statusCode == 200) {
-      print('Product data fetched successfully.');
       final data = jsonDecode(response.body);
       _nomController.text = data['nom'];
       _descripcioController.text = data['descripcio'];
@@ -56,14 +54,12 @@ class _ProductFormState extends State<ProductForm> {
       _categoriaController.text = data['categoria'].toString();
       _numCompresController.text = data['num_compres'].toString();
     } else {
-      print('Failed to fetch product data. Status code: ${response.statusCode}');
       throw Exception('Has fet alguna cosa malament!');
     }
   }
   
   Future<void> saveData() async {
     if (_formKey.currentState!.validate()) {
-      print('Saving data...');
       final response = await http.post(
         Uri.parse('http://127.0.0.1:8000/post/product/add/'),
         headers: <String, String>{
@@ -85,10 +81,8 @@ class _ProductFormState extends State<ProductForm> {
         }),
       );
       if (response.statusCode == 201) {
-        print('Data saved successfully.');
       } else {
-        print('Failed to save data. Status code: ${response.statusCode}');
-        throw Exception('Failed to post data');
+        throw Exception('No s ha guardat');
       }
     } else {
       print('Form is not valid. Not saving data.');
@@ -126,7 +120,7 @@ class _ProductFormState extends State<ProductForm> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a descripcio';
+                    return 'Indica una descripcio';
                   }
                   return null;
                 },
@@ -178,7 +172,7 @@ class _ProductFormState extends State<ProductForm> {
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a preu maxim';
+                    return 'Indica un preu maxim';
                   }
                   return null;
                 },
@@ -190,7 +184,7 @@ class _ProductFormState extends State<ProductForm> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a preu minim';
+                    return 'Indica un preu minim';
                   }
                   return null;
                 },
@@ -202,7 +196,7 @@ class _ProductFormState extends State<ProductForm> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a multiplicador resta';
+                    return 'Indica un multiplicador resta';
                   }
                   return null;
                 },
@@ -214,7 +208,7 @@ class _ProductFormState extends State<ProductForm> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a multiplicador suma';
+                    return 'Indica un multiplicador suma';
                   }
                   return null;
                 },
@@ -226,7 +220,7 @@ class _ProductFormState extends State<ProductForm> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a usuari';
+                    return 'Introdueix un usuari';
                   }
                   return null;
                 },
@@ -238,7 +232,7 @@ class _ProductFormState extends State<ProductForm> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a categoria';
+                    return 'Introdueix una categoria';
                   }
                   return null;
                 },
@@ -251,7 +245,7 @@ class _ProductFormState extends State<ProductForm> {
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a num compres';
+                     return 'Introdueix una quantitat de compres';
                   }
                   return null;
                 },
@@ -262,7 +256,7 @@ class _ProductFormState extends State<ProductForm> {
                     saveData();
                   }
                 },
-                child: Text('Submit'),
+                child: Text('Afegeix el Producte'),
               ),
             ],
           ),

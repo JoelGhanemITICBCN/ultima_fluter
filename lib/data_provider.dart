@@ -35,9 +35,28 @@ class DataProvider with ChangeNotifier {
           'nom': product['nom'],
           'preu': product['preu'],
           'descripcio': product['descripcio'],
+          'usuari': product['usuari'],
         };
       }).toList();
       notifyListeners();
     }
   }
+  Future<Map<String, dynamic>> fetchStatistics(String userId, [String productId = '']) async {
+    final response = await http.get(Uri.parse('http://127.0.0.1:8000/post/estadisticas/$userId/$productId'));
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to load statistics');
+    }
+  }
+ Future<void> deleteProduct(int id) async {
+    final response = await http.delete(Uri.parse('http://127.0.0.1:8000/post/product/delete/$id/'));
+    if (response.statusCode == 200) {
+      fetchAllProducts();
+    } else {
+      throw Exception('Failed to delete product');
+    }
+  }
+
 }
