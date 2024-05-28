@@ -6,6 +6,7 @@ import 'home_page.dart';
 void main() {
   runApp(
     ChangeNotifierProvider(
+    //instancia de la clase DataProvider
       create: (context) => DataProvider(),
       child: MyApp(),
     ),
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
           backgroundColor: Colors.green[800], 
         ),
       ),
+      //MyHomePage determina la pantalla principal
       home: MyHomePage(),
     );
   }

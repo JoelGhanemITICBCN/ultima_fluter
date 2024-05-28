@@ -12,6 +12,7 @@ class VisualitzarProductes extends StatefulWidget {
 }
 
 class _VisualitzarProductesState extends State<VisualitzarProductes> {
+  //Listas para guardar los valores
   List<Map<String, dynamic>> selectedUserProducts = [];
   String? selectedUserId;
   String? selectedProductId;
@@ -19,27 +20,32 @@ class _VisualitzarProductesState extends State<VisualitzarProductes> {
   @override
   void initState() {
     super.initState();
+    //Llama a las funciones para tener las tiendas y los productos
     Provider.of<DataProvider>(context, listen: false).fetchAllUsers();
     Provider.of<DataProvider>(context, listen: false).fetchAllProducts();
   }
 
   @override
   Widget build(BuildContext context) {
+    //Hace la barra con el titulo de visualizar productos
     return Scaffold(
       appBar: AppBar(
         title: const Text('Visualitzar Productes'),
       ),
+      //Consume el dataProvider para que cambie cuando cambien los datos
       body: Consumer<DataProvider>(
         builder: (context, dataProvider, child) {
           if (dataProvider.users.isEmpty || dataProvider.products.isEmpty) {
             return CircularProgressIndicator();
           } else {
+            //Muestra los productos en una lista
             return ListView(
               children: dataProvider.products.map((product) {
                 return Card(
                   child: ListTile(
                     title: GestureDetector(
                       onTap: () {
+                        //Te manda a modifiucar el producto si clickas sobre el nombre
                         if (product['id'] != null) {
                           Navigator.push(
                             context,
@@ -54,8 +60,9 @@ class _VisualitzarProductesState extends State<VisualitzarProductes> {
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        //Icono de agregar ventas 
                         IconButton(
-                          icon: Icon(Icons.add_circle, color: Colors.green), // Green add icon
+                          icon: Icon(Icons.add_circle, color: Colors.green), 
                           onPressed: () {
                             if (product['id'] != null) {
                               Navigator.push(
@@ -63,12 +70,13 @@ class _VisualitzarProductesState extends State<VisualitzarProductes> {
                                 MaterialPageRoute(builder: (context) => AddSaleScreen(productId: product['id'])),
                               );
                             } else {
-                              print('Product ID is null');
+                              print('El ID del producto no es valido');
                             }
                           },
                         ),
+                        //Icono de editar producto
                         IconButton(
-                          icon: Icon(Icons.edit, color: Colors.yellow), // Yellow edit icon
+                          icon: Icon(Icons.edit, color: Colors.yellow), 
                           onPressed: () {
                             if (product['id'] != null) {
                               Navigator.push(
@@ -76,10 +84,11 @@ class _VisualitzarProductesState extends State<VisualitzarProductes> {
                                 MaterialPageRoute(builder: (context) => EditaForm(productId: product['id'].toString(), id: product['id'])),
                               );
                             } else {
-                              print('Product ID is null');
+                              print('El ID del producto no es valido');
                             }
                           },
                         ),
+                        //Icono de borrar producto
                         IconButton(
                           icon: Icon(Icons.delete, color: Colors.red), 
                           onPressed: () {

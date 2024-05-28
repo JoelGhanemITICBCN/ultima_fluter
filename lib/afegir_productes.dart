@@ -1,8 +1,7 @@
-//LO dejo a medias por ahora que creo que es mas necesario el homeview, falta dejar bien lo de la introd. de campos
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+import 'visualitzar_productes.dart';
 class ProductForm extends StatefulWidget {
   final int? id;
 
@@ -57,7 +56,7 @@ class _ProductFormState extends State<ProductForm> {
       throw Exception('Has fet alguna cosa malament!');
     }
   }
-  
+
   Future<void> saveData() async {
     if (_formKey.currentState!.validate()) {
       final response = await http.post(
@@ -73,7 +72,8 @@ class _ProductFormState extends State<ProductForm> {
           'cost': double.parse(_costController.text),
           'preu_maxim': double.parse(_preuMaximController.text),
           'preu_minim': double.parse(_preuMinimController.text),
-          'multiplicador_resta': double.parse(_multiplicadorRestaController.text),
+          'multiplicador_resta':
+              double.parse(_multiplicadorRestaController.text),
           'multiplicador_suma': double.parse(_multiplicadorSumaController.text),
           'usuari': int.parse(_usuariController.text),
           'categoria': int.parse(_categoriaController.text),
@@ -245,18 +245,23 @@ class _ProductFormState extends State<ProductForm> {
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                     return 'Introdueix una quantitat de compres';
+                    return 'Introdueix una quantitat de compres';
                   }
                   return null;
                 },
               ),
-               ElevatedButton(
+              ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     saveData();
                   }
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => VisualitzarProductes()),
+                  );
                 },
-                child: Text('Afegeix el Producte'),
+                child: Text('Afegeix el producte'),
               ),
             ],
           ),

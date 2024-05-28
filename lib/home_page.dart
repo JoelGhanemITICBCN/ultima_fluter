@@ -19,6 +19,7 @@ class MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    //Agafa tots els productes i usuaris
     Provider.of<DataProvider>(context, listen: false).fetchAllUsers();
     Provider.of<DataProvider>(context, listen: false).fetchAllProducts();
   }
@@ -26,9 +27,11 @@ class MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      //Appbar amb el titol de preus dinamics
       appBar: AppBar(
         title: const Text('Preus Dinamics'),
       ),
+      //Consumim el dataProvider per a que canvii quan canvii la informació
       body: Consumer<DataProvider>(
         builder: (context, dataProvider, child) {
           if (dataProvider.users.isEmpty || dataProvider.products.isEmpty) {
@@ -38,15 +41,16 @@ class MyHomePageState extends State<MyHomePage> {
               .where((product) => product['usuari'].toString() == selectedUserId)
               .toList();
 
-            return Padding( // Agregamos un padding alrededor del Row
-              padding: const EdgeInsets.only(top: 20.0), // 20.0 es el espacio desde el AppBar
+            // "CSS" del AppBar
+            return Padding( 
+              padding: const EdgeInsets.only(top: 20.0), 
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Column(
                     children: [
-                      Padding( // Agregamos un padding alrededor del primer botón
-                        padding: const EdgeInsets.only(bottom: 20.0), // 20.0 es el espacio entre los botones
+                      Padding( 
+                        padding: const EdgeInsets.only(bottom: 20.0), 
                         child: ElevatedButton(
                           onPressed: () {
                             Navigator.push(
@@ -58,15 +62,17 @@ class MyHomePageState extends State<MyHomePage> {
                           style: ButtonStyle(
                             backgroundColor: MaterialStateProperty.all<Color>(Colors.green),
                             foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                            shape: MaterialStateProperty.all<RoundedRectangleBorder>( // Hacemos el botón más cuadrado
+                            shape: MaterialStateProperty.all<RoundedRectangleBorder>( 
                               RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0), // 10.0 es el radio de la esquina
+                                borderRadius: BorderRadius.circular(10.0), 
                               ),
                             ),
                           ),
                         ),
                       ),
+                      // Botón para modificar productos
                       ElevatedButton(
+                        //Va a la view de los productos al hacer click
                         onPressed: () {
                           Navigator.push(
                             context,
@@ -77,15 +83,16 @@ class MyHomePageState extends State<MyHomePage> {
                         style: ButtonStyle(
                           backgroundColor: MaterialStateProperty.all<Color>(Colors.green),
                           foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                          shape: MaterialStateProperty.all<RoundedRectangleBorder>( // Hacemos el botón más cuadrado
+                          shape: MaterialStateProperty.all<RoundedRectangleBorder>( 
                             RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0), // 10.0 es el radio de la esquina
+                              borderRadius: BorderRadius.circular(10.0), 
                             ),
                           ),
                         ),
                       ),
                     ],
                   ),
+                //Segunda columna con las estadísticas
                 Column(
                   children: [
                     const Text(
@@ -93,6 +100,7 @@ class MyHomePageState extends State<MyHomePage> {
                       style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                     if (selectedUserId != null && selectedProductId != null)
+                      //LLama a las estadísticas
                       FutureBuilder<Map<String, dynamic>>(
                         future: dataProvider.fetchStatistics(selectedUserId!, selectedProductId!),
                         builder: (context, snapshot) {
@@ -103,17 +111,19 @@ class MyHomePageState extends State<MyHomePage> {
                           } else {
                             return Column(
                               children: <Widget>[
-                                Text('Beneficios: ${snapshot.data!['beneficios']}'),
+                                Text('Beneficios: ${double.parse(snapshot.data!['beneficios'].toString()).toStringAsFixed(2)} \$'),
                                 Text('Volumen de ventas: ${snapshot.data!['total_vendidos']}'),
                               ],
                             );
                           }
                         },
                       ),
+                    //Te pide los dos campos para mostrar las estadisticas segun el producto
                     if (selectedUserId == null || selectedProductId == null)
                       const Text('Por favor, selecciona un usuario y un producto'),
                   ],
                 ),
+                //Columna para seleccionar la tienda y el producto
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -121,6 +131,7 @@ class MyHomePageState extends State<MyHomePage> {
                       value: selectedUserId,
                       onChanged: (String? newValue) {
                         setState(() {
+                          //Cambia los valores del usuario y el usuario de los productos
                           selectedUserId = newValue;
                           selectedUserProducts = dataProvider.products
                             .where((product) => product['usuari'].toString() == newValue)

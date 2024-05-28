@@ -2,17 +2,22 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+// Gestiona todos los datos de la aplicación
 class DataProvider with ChangeNotifier {
+  //Listas para guardar productos y users
   List<Map<String, dynamic>> _products = [];
   List<Map<String, dynamic>> _users = [];
 
+// Getters
   List<Map<String, dynamic>> get products => _products;
   List<Map<String, dynamic>> get users => _users;
 
   Future<void> fetchAllUsers() async {
     final response = await http.get(Uri.parse('http://127.0.0.1:8000/post/users/'));
 
+//Si va todo bien 
     if (response.statusCode == 200) {
+      //Pasar  id y nombre a JSON
       List<dynamic> usersJson = jsonDecode(response.body);
       _users = usersJson.map<Map<String, dynamic>>((user) {
         return {
@@ -20,6 +25,7 @@ class DataProvider with ChangeNotifier {
           'nombre': user['nom'],
         };
       }).toList();
+      //Avisa al resto de apps que los datos han cambiado
       notifyListeners();
     }
   }
